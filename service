@@ -25,7 +25,6 @@
 #		
 # Locally we will use a few also
 # 
-#		$PASSWDHIDE - Hidden password to ************
 #		cmd for our case statement is the first parameter passed in is either start or stop
 # 		to run: service <start> or <stop> 
 #
@@ -46,29 +45,28 @@ print_log "$(env)"
 
 cmd=$1
 serviceStatus=""
-export PASSWDHIDE=xxxxxxxxxx
 
 if [ -n "$gitTag" ]; then
     agentSendLogMessage  "Found gitTag parameter gitTag = ${gitTag}"
 else
      agentSendLogMessage  "Didn't find custom parameter gitTag. Using gitTag=master"
-     gitTag="Heat stack create service"
+     gitTag="Cloud Foundry push service"
 fi
 print_log "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
 
-print_log "INSTALL - Installing epl-release"
-yum install -y epel-release
+#print_log "INSTALL - Installing epl-release"
+#sudo yum install -y epel-release
 
 print_log "INSTALL - Installing wget for application bits download"
 sudo yum install -y wget
 
 print_log "INSTALL - Installing Java8 for gradle compiles"
 sudo yum install -y java-1.8.0-openjdk-headless
-sudo yum install java-1.8.0-openjdk-devel
+sudo yum install -y java-1.8.0-openjdk-devel
 
 # Fetch the bits for the CLI using WGET
 print_log "Downloading the CLI tools needed for cloud foundry"
-sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
 
 print_log "INSTALL - Installing Cloud Foundry CLI client ..."
 sudo yum install -y cf-cli
