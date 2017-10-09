@@ -17,7 +17,9 @@
 	*	$CF_SPACE - Space
 	*	$CF_APP_URL - URL to HTTP location to grab application
 	*	$CF_APP_NAME - App name in CF that we are creating 
-	*	$APP_DIR - name of the applications directory 
+	*	$APP_DIR - name of the applications directory
+	*   $APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
+
 		
 ### Locally we will use a few also
  
