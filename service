@@ -65,7 +65,7 @@ sudo yum install -y java-1.8.0-openjdk-devel
 
 # Fetch the bits for the CLI using WGET
 print_log "Downloading the CLI tools needed for cloud foundry"
-wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
 
 print_log "INSTALL - Installing Cloud Foundry CLI client ..."
 sudo yum install -y cf-cli
@@ -81,7 +81,7 @@ case $cmd in
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE 
           print_log "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
           print_log "START - Downloading ... the Application from $CF_APP_URL and saving locally"
-          wget -N $CF_APP_URL
+          git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           cd $APP_DIR
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
