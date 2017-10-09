@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+#
+# cf-push
+
+# This is a Cisco Cloud Center external service example to deploy an Cloud Foundry Application
+# Cloud Foundry is a PaaS system, so what we are doing is front ending the Login and Push
+#   Process with a Cloud Center button that will ask for all the needed information to deploy
+#   an application into the Cloud Foundry PaaS platform.  
+# 
+# This service leverages the default Cloud Foundry CLI commands as well as the default ENV vars that CF uses
+# for login, password, Organization, Space, API endpoint.  I have defined them below. 
+# 
+#
+# Cloud Foundry env vars to be used or mapped into Cloud Center
+#
+#		$CF_API - API endpoint of cloud foundry instance  
+#		$CF_USER - User name in cloud foundry
+#		$CF_PASS - Password
+#		$CF_ORG - Org
+#		$CF_SPACE - Space
+#		$CF_APP_URL - URL to HTTP location to grab application
+#		$CF_APP_NAME - App name in CF that we are creating 
+#		$APP_DIR - Name of the directory the applications is in
+#		
+# Locally we will use a few also
+# 
+#		$PASSWDHIDE - Hidden password to ************
+#		cmd for our case statement is the first parameter passed in is either start or stop
+# 		to run: service <start> or <stop> 
+#
+#
+#
+
+
+CF_APP_BUILD_TYPE="gradle" 
+
+yum update -y
+
+. /utils.sh
+
+
+env
+
+print_log "$(env)"
+
+cmd=$1
+serviceStatus=""
+export PASSWDHIDE=xxxxxxxxxx
+
+if [ -n "$gitTag" ]; then
+    agentSendLogMessage  "Found gitTag parameter gitTag = ${gitTag}"
+else
+     agentSendLogMessage  "Didn't find custom parameter gitTag. Using gitTag=master"
+     gitTag="Heat stack create service"
+fi
+print_log "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
+
+print_log "INSTALL - Installing epl-release"
+yum install -y epel-release
+
+print_log "INSTALL - Installing wget for application bits download"
+sudo yum install -y wget
+
+print_log "INSTALL - Installing Java8 for gradle compiles"
+sudo yum install -y java-1.8.0-openjdk-headless
+sudo yum install java-1.8.0-openjdk-devel
+
+# Fetch the bits for the CLI using WGET
+print_log "Downloading the CLI tools needed for cloud foundry"
+sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
+
+print_log "INSTALL - Installing Cloud Foundry CLI client ..."
+sudo yum install -y cf-cli
+
+Print_log "Install git" 
+sudo yum install -y git
+
+# Run the Cloud Foundry Push Service
+case $cmd in
+        start)
+          # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
+          print_log "Logging into Cloud Foundry" 
+          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE 
+          print_log "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
+          print_log "START - Downloading ... the Application from $CF_APP_URL and saving locally"
+          wget -N $CF_APP_URL
+          APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
+          cd $APP_DIR
+          # Compile Application, in future this should be a switch for mavin, gradle, python ...
+          ./gradlew clean assemble
+          # This is the Meat of the service, call cf cli and push the application to CF
+          cf push $CF_APP_NAME
+          print_log "Cloud Foundry Application now deployed"
+          serviceStatus="Started"
+        ;;
+        stop)   
+          print_log "REMOVE - delete a stack called "$STACK
+          heat stack-delete $STACK
+          serviceStatus="Stopped"
+        ;;
+        *)
+          serviceStatus="Error: Not a valid argument"
+        exit 127
+        ;;
+esac
