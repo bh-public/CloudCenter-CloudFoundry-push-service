@@ -80,6 +80,7 @@ case $cmd in
           # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
           print_log "Logging into Cloud Foundry" 
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
+          echo $CF_API > api.log
           echo $CF_USER > user.log
           echo $CF_PASS > pass.log
           echo $CF_ORG > org.log
