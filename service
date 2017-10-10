@@ -79,7 +79,7 @@ case $cmd in
           touch foofoo.file
           # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
           print_log "Logging into Cloud Foundry" 
-          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
           cf apps > apps.running 
           print_log "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
           print_log "START - Downloading ... the Application from $CF_APP_URL and saving locally"
