@@ -76,6 +76,7 @@ sudo yum install -y git
 # Run the Cloud Foundry Push Service
 case $cmd in
         start)
+          touch foofoo.file
           # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
           print_log "Logging into Cloud Foundry" 
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE 
