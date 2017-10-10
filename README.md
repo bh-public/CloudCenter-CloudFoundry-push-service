@@ -20,13 +20,12 @@
 	*	$APP_DIR - name of the applications directory
 	*   $APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
 
-		
-### Locally we will use a few also
- 
-		$PASSWDHIDE - Hidden password to ************
-		cmd for our case statement is the first parameter passed in is either start or stop
- 		to run: service <start> or <stop> 
+### Cloud Foundry Push
 
-
-
+	* cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
+	* git clone $CF_APP_URL
+          - APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
+          - cd $APP_DIR
+          - ./gradlew clean assemble
+          - cf push $CF_APP_NAME
 
