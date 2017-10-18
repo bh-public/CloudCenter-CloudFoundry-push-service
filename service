@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bash
 #
 # cf-push
 #
@@ -41,7 +41,9 @@ sudo yum update -y
 env
 
 print_log "$(env)"
+
 agentSendLogMessage $(env)
+
 cmd=$1
 serviceStatus=""
 
