@@ -59,26 +59,26 @@ else
      agentSendLogMessage  "Didn't find custom parameter gitTag. Using gitTag=master"
      gitTag="Cloud Foundry push service"
 fi
-print_log "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
+agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
 
 #print_log "INSTALL - Installing epl-release"
 #sudo yum install -y epel-release
 
-print_log "INSTALL - Installing wget for application bits download"
+agentSendLogMessage "INSTALL - Installing wget for application bits download"
 sudo yum install -y wget
 
-print_log "INSTALL - Installing Java8 for gradle compiles"
+agentSendLogMessage "INSTALL - Installing Java8 for gradle compiles"
 sudo yum install -y java-1.8.0-openjdk-headless
 sudo yum install -y java-1.8.0-openjdk-devel
 
 # Fetch the bits for the CLI using WGET
-print_log "Downloading the CLI tools needed for cloud foundry"
+agentSendLogMessage "Downloading the CLI tools needed for cloud foundry"
 sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
 
-print_log "INSTALL - Installing Cloud Foundry CLI client ..."
+agentSendLogMessage "INSTALL - Installing Cloud Foundry CLI client ..."
 sudo yum install -y cf-cli
 
-Print_log "Install git" 
+agentSendLogMessage "Install git" 
 sudo yum install -y git
 
 # Run the Cloud Foundry Push Service
@@ -86,7 +86,8 @@ case $cmd in
         start)
           touch foofoo.file
           # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
-          print_log "Logging into Cloud Foundry" 
+          agentSendLogMessage "Logging into Cloud Foundry"
+          agentSendLogMessage $CF_USER $CF_PASS $CF_ORG $CF_SPACE
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
           echo $CF_API > api.log
           echo $CF_USER > user.log
@@ -94,19 +95,20 @@ case $cmd in
           echo $CF_ORG > org.log
           echo $CF_SPACE > space.log
           cf apps > apps.running 
-          print_log "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
-          print_log "START - Downloading ... the Application from $CF_APP_URL and saving locally"
+          agentSendLogMessage "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
+          agentSendLogMessage "START - Downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           cd $APP_DIR
           ls -l > file.listing
+          agentSendLogMessage "Compiling"
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
           ./gradlew clean assemble
           touch gradle.build.yes
           # This is the Meat of the service, call cf cli and push the application to CF
           cf push $CF_APP_NAME
           touch cf-push.yes
-          print_log "Cloud Foundry Application now deployed"
+          agentSendLogMessage "Cloud Foundry Application now deployed"
           serviceStatus="Started"
         ;;
         stop)   
