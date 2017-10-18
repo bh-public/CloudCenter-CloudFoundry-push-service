@@ -41,7 +41,7 @@ sudo yum update -y
 env
 
 print_log "$(env)"
-
+agentSendLogMessage $(env)
 cmd=$1
 serviceStatus=""
 
