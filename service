@@ -41,9 +41,10 @@ cd ~
 
 # Move over cliqr repo and move back at end.
 sudo mv /etc/yum.repos.d/cliqr.repo ~
-
+agentSendLogMessage "Executing a YUM UPDATE and installing epl-release" 
 sudo yum update -y
-
+#print_log "INSTALL - Installing epl-release"
+sudo yum install -y epel-release
 . /utils.sh
 
 
@@ -64,8 +65,7 @@ else
 fi
 agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
 
-#print_log "INSTALL - Installing epl-release"
-#sudo yum install -y epel-release
+
 
 agentSendLogMessage "INSTALL - Installing wget for application bits download"
 sudo yum install -y wget
