@@ -60,7 +60,7 @@ else
      gitTag="Cloud Foundry push service"
 fi
 agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
-
+sudo mv /etc/yum.repos.d/cliqr.repo ~
 #print_log "INSTALL - Installing epl-release"
 #sudo yum install -y epel-release
 
@@ -121,3 +121,4 @@ case $cmd in
         exit 127
         ;;
 esac
+sudo mv ~/cliqr.repo /etc/yum.repos.d/
