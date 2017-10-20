@@ -37,14 +37,18 @@ exec > >(tee -a /var/tmp/swarm-init_$$.log) 2>&1
 . /usr/local/osmosix/etc/userenv
 . /usr/local/osmosix/service/utils/cfgutil.sh
 . /usr/local/osmosix/service/utils/agent_util.sh
+
 cd ~
 
 # Move over cliqr repo and move back at end.
 sudo mv /etc/yum.repos.d/cliqr.repo ~
+
 agentSendLogMessage "Executing a YUM UPDATE and installing epl-release" 
+
 sudo yum update -y
+
 #print_log "INSTALL - Installing epl-release"
-sudo yum install -y epel-release
+# sudo yum install -y epel-release
 . /utils.sh
 
 
