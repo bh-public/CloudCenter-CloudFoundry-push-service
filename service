@@ -22,27 +22,28 @@
 #		$CF_APP_NAME - App name in CF that we are creating 
 #		$APP_DIR - Name of the directory the applications is in
 # 		$APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
-#		
+#		(today we only have gradle in this example, enhancement to expand it to the UI)
 # Locally we will use a few also
 # 
 #		cmd for our case statement is the first parameter passed in is either start or stop
 # 		to run: service <start> or <stop> 
 #
 #
-#
 
 exec > >(tee -a /var/tmp/swarm-init_$$.log) 2>&1
 
-. /usr/local/osmosix/etc/.osmosix.sh
-. /usr/local/osmosix/etc/userenv
-. /usr/local/osmosix/service/utils/cfgutil.sh
-. /usr/local/osmosix/service/utils/agent_util.sh
+source /usr/local/osmosix/etc/.osmosix.sh
+source /usr/local/osmosix/etc/userenv
+source /usr/local/osmosix/service/utils/cfgutil.sh
+source /usr/local/osmosix/service/utils/agent_util.sh
 
 cd ~
 
 # Move over cliqr repo and move back at end.
 sudo mv /etc/yum.repos.d/cliqr.repo ~
 
+agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
+agentSendLogMessage "We need to update the OS and add some packages to run the service"
 agentSendLogMessage "Executing a YUM UPDATE and installing epl-release" 
 
 sudo yum update -y
@@ -65,9 +66,9 @@ if [ -n "$gitTag" ]; then
     agentSendLogMessage  "Found gitTag parameter gitTag = ${gitTag}"
 else
      agentSendLogMessage  "Didn't find custom parameter gitTag. Using gitTag=master"
-     gitTag="Cloud Foundry push service"
+     gitTag="Cloud Foundry push service for Cisco Cloud Center"
 fi
-agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
+
 
 
 
@@ -87,26 +88,27 @@ sudo yum install -y cf-cli
 
 agentSendLogMessage "Install git" 
 sudo yum install -y git
-
+agentSendLogMessage "All done with needed packages for the service, now to login and push app"
 # Run the Cloud Foundry Push Service
 case $cmd in
         start)
+    	  agentSendLogMessage "Executing START in the Script to login, GIT, Compile and CF Push App" 
           agentSendLogMessage "cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]" 
           agentSendLogMessage "Logging into Cloud Foundry using the following ...."
           agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
-          agentSendLogMessage "START - GIT CLONE download ... the Application from $CF_APP_URL and saving locally"
+          agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           cd $APP_DIR
-          agentSendLogMessage "Compiling"
+          agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
           ./gradlew clean assemble
           # This is the Meat of the service, call cf cli and push the application to CF
           cf push $CF_APP_NAME
           agentSendLogMessage "Cloud Foundry Application now deployed"
-          serviceStatus="Started"
+          serviceStatus="Our internal Service has now been Started"
         ;;
         stop)   
           agentSendLogMessage "REMOVE - delete a stack called " $CF_APP_NAME
