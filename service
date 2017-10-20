@@ -23,6 +23,7 @@
 #		$APP_DIR - Name of the directory the applications is in
 # 		$APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
 #		(today we only have gradle in this example, enhancement to expand it to the UI)
+#
 # Locally we will use a few also
 # 
 #		cmd for our case statement is the first parameter passed in is either start or stop
@@ -48,8 +49,8 @@ agentSendLogMessage "Executing a YUM UPDATE and installing epl-release"
 
 sudo yum update -y
 
-#print_log "INSTALL - Installing epl-release"
 # sudo yum install -y epel-release
+
 . /utils.sh
 
 
@@ -88,7 +89,7 @@ sudo yum install -y cf-cli
 
 agentSendLogMessage "Install git" 
 sudo yum install -y git
-agentSendLogMessage "All done with needed packages for the service, now to login and push app"
+agentSendLogMessage "All done with needed packages for the service, now to login, compile and push app"
 # Run the Cloud Foundry Push Service
 case $cmd in
         start)
@@ -101,6 +102,7 @@ case $cmd in
           agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
+          agentSendLogMessage "changing directory to $APP_DIR"
           cd $APP_DIR
           agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
