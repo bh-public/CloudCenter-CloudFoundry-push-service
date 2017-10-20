@@ -107,13 +107,15 @@ case $cmd in
           agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
           ./gradlew clean assemble
-          # This is the Meat of the service, call cf cli and push the application to CF
-          cf push $CF_APP_NAME
+          # This is the Meat of the service, call cf cli and cf push the application to CF
+          cf push $CF_APP_NAME > cfrun.log
+          CF_LOG=$(cat cfrun.log)
+          agentSendLogMessage "$CF_LOG"
           agentSendLogMessage "Cloud Foundry Application now deployed"
           serviceStatus="Our internal Service has now been Started"
         ;;
         stop)   
-          agentSendLogMessage "REMOVE - delete a stack called " $CF_APP_NAME
+          agentSendLogMessage "REMOVE - delete a stack called $CF_APP_NAME"
           cf delete $CF_APP_NAME
           serviceStatus="Stopped"
         ;;
