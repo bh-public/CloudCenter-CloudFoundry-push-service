@@ -1,0 +1,7 @@
+CF_API="https://api.run.pivotal.io"
+CF_USER="biharper@cisco.com"
+CF_PASS="MetacloudSE1"
+CF_ORG="Metacloud"
+CF_SPACE="development"
+CF_APP_URL="https://github.com/cloudfoundry-samples/spring-music"
+CF_APP_NAME="spring-music-bill"

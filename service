@@ -87,36 +87,26 @@ sudo yum install -y git
 # Run the Cloud Foundry Push Service
 case $cmd in
         start)
-          touch foofoo.file
-          # cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]
+          agentSendLogMessage "cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]" 
           agentSendLogMessage "Logging into Cloud Foundry using the following ...."
-          agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+          agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
-          echo $CF_API > api.log
-          echo $CF_USER > user.log
-          echo $CF_PASS > pass.log
-          echo $CF_ORG > org.log
-          echo $CF_SPACE > space.log
-          cf apps > apps.running 
-          agentSendLogMessage "Cloud Foundry Application name to deploy is " $CF_APP_NAME     
-          agentSendLogMessage "START - Downloading ... the Application from $CF_APP_URL and saving locally"
+          agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
+          agentSendLogMessage "START - GIT CLONE download ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           cd $APP_DIR
-          ls -l > file.listing
           agentSendLogMessage "Compiling"
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
           ./gradlew clean assemble
-          touch gradle.build.yes
           # This is the Meat of the service, call cf cli and push the application to CF
           cf push $CF_APP_NAME
-          touch cf-push.yes
           agentSendLogMessage "Cloud Foundry Application now deployed"
           serviceStatus="Started"
         ;;
         stop)   
-          print_log "REMOVE - delete a stack called "$STACK
-          heat stack-delete $STACK
+          agentSendLogMessage "REMOVE - delete a stack called " $CF_APP_NAME
+          cf delete $CF_APP_NAME
           serviceStatus="Stopped"
         ;;
         *)
