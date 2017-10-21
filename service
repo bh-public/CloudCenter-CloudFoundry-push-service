@@ -108,7 +108,9 @@ case $cmd in
           cd $APP_DIR
           agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
-          ./gradlew clean assemble
+          ./gradlew clean assemble > compile.log
+          COMPILE_LOG=$(cat compile.log)
+          appSendLogMessage "$COMPILE_LOG"
           # This is the Meat of the service, call cf cli and cf push the application to CF
           cf push $CF_APP_NAME > cfrun.log
           CF_LOG=$(cat cfrun.log)
