@@ -6,7 +6,10 @@
    an application into the Cloud Foundry PaaS platform.  
  
  * This service leverages the default Cloud Foundry CLI commands as well as the default ENV vars that CF uses
- for login, password, Organization, Space, API endpoint.  I have defined them below. 
+   for login, password, Organization, Space, API endpoint.  I have defined them below. 
+   
+   Lastly this service ONLY pulls from GIT today, that was the easiest way to get it working and
+   should be where all code is stored anyhow.  And it FREE
 
  ### Cloud Foundry env vars to be used or mapped into Cloud Center
 
