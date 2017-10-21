@@ -29,7 +29,6 @@
 #		cmd for our case statement is the first parameter passed in is either start or stop
 # 		to run: service <start> or <stop> 
 #
-#
 
 exec > >(tee -a /var/tmp/swarm-init_$$.log) 2>&1
 
