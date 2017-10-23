@@ -110,7 +110,7 @@ case $cmd in
           CF_LOGIN_LOG=$(cat cf-login.log) 
           agentSendLogMessage "$CF_LOGIN_LOG"
           agentSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
-          cf target -o $CF_ORG -s CF_SPACE > cf-target.log
+          cf target -o $CF_ORG -s $CF_SPACE > cf-target.log
           CF_TARGET_LOG=$(cat cf-target.log)
           agentSendLogMessage "$CF_TARGET_LOG"
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
