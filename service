@@ -93,12 +93,19 @@ agentSendLogMessage "All done with needed packages for the service, now to login
 case $cmd in
         start)
     	  agentSendLogMessage "Executing START in the Script to login, GIT, Compile and CF Push App" 
-          agentSendLogMessage "cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]" 
+          #agentSendLogMessage "cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]" 
           agentSendLogMessage "Logging into Cloud Foundry using the following ...."
-          agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
-          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
-          CF_LOGIN_LOG=$(cat cflogin.log)
-          agentSentLogMessage "$CF_LOGIN_LOG"
+          #agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
+          #cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+          #CF_LOGIN_LOG=$(cat cflogin.log)
+          #agentSentLogMessage "$CF_LOGIN_LOG"
+          # trying a new way
+          agentSendLogMessage "cf api $CF_API"
+          cf api $CF_API
+          agentSendLogMessage "cf auth $CF_USER $CF_PASS"
+          cf auth $CF_USER $CF_PASS
+          appSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
+          agent target -o $CF_ORG -s CF_SPACE
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
           agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
