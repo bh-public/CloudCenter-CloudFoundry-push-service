@@ -109,8 +109,8 @@ case $cmd in
           cf auth $CF_USER $CF_PASS > cf-login.log
           CF_LOGIN_LOG=$(cat cf-login.log) 
           agentSendLogMessage "$CF_LOGIN_LOG"
-          appSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
-          agent target -o $CF_ORG -s CF_SPACE
+          agentSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
+          cf target -o $CF_ORG -s CF_SPACE
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
           agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
