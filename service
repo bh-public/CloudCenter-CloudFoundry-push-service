@@ -102,8 +102,13 @@ case $cmd in
           # trying a new way
           agentSendLogMessage "cf api $CF_API"
           cf api $CF_API
+          cf api > cf-api.log
+          CF_API_LOG=$(cat cf-api.log)
+          agentSendLogMessage "API endpoint set to $CF_API_LOG"
           agentSendLogMessage "cf auth $CF_USER $CF_PASS"
-          cf auth $CF_USER $CF_PASS
+          cf auth $CF_USER $CF_PASS > cf-login.log
+          CF_LOGIN_LOG=$(cat cf-login.log) 
+          agentSendLogMessage "$CF_LOGIN_LOG"
           appSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
           agent target -o $CF_ORG -s CF_SPACE
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
