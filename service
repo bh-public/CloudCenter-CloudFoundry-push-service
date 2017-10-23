@@ -100,20 +100,24 @@ case $cmd in
           #CF_LOGIN_LOG=$(cat cflogin.log)
           #agentSentLogMessage "$CF_LOGIN_LOG"
           # trying a new way
+          # First lets set the API endpoint
           agentSendLogMessage "cf api $CF_API"
           cf api $CF_API
           cf api > cf-api.log
           CF_API_LOG=$(cat cf-api.log)
           agentSendLogMessage "API endpoint set to $CF_API_LOG"
+          # Next lets login with username and passwd
           agentSendLogMessage "cf auth $CF_USER $CF_PASS"
           cf auth $CF_USER $CF_PASS > cf-login.log
           CF_LOGIN_LOG=$(cat cf-login.log) 
           agentSendLogMessage "$CF_LOGIN_LOG"
+          # Next lets set the target organization and space for our application
           agentSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
           cf target -o $CF_ORG -s $CF_SPACE > cf-target.log
           CF_TARGET_LOG=$(cat cf-target.log)
           agentSendLogMessage "$CF_TARGET_LOG"
-          agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"     
+          agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"
+          # Next clone the app package from github     
           agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
@@ -121,10 +125,21 @@ case $cmd in
           cd $APP_DIR
           agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
           # Compile Application, in future this should be a switch for mavin, gradle, python ...
-          ./gradlew clean assemble > compile.log
-          COMPILE_LOG=$(cat compile.log)
-          appSendLogMessage "$COMPILE_LOG"
+          case $APP_BUILD_TYPE in
+          		Mavin)
+               ./gradlew clean assemble > compile.log
+               COMPILE_LOG=$(cat compile.log)
+               appSendLogMessage "$COMPILE_LOG"
+           	   ;;
+           	   Python)
+           	   # No compile necessary
+           	   ;;
+           	   Web)
+           	   # check for static file, for php and static web apps
+           	   ;;
+          esac
           # This is the Meat of the service, call cf cli and cf push the application to CF
+          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
           cf push $CF_APP_NAME > cfrun.log
           CF_LOG=$(cat cfrun.log)
           agentSendLogMessage "$CF_LOG"
