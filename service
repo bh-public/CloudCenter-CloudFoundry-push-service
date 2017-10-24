@@ -112,9 +112,9 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
           		chmod +x gradlew 
-                source gradlew clean assemble > compile.log
-                COMPILE_LOG=$(cat compile.log)
-                appSendLogMessage "$COMPILE_LOG"
+                source gradlew clean assemble
+                # COMPILE_LOG=$(cat compile.log)
+                # appSendLogMessage "$COMPILE_LOG"
            	 ;;
            	 Python)
            	 agentSendLogMessage "PYTHON APPLICATION - Processing Application in Cloud Foundry"
@@ -142,6 +142,7 @@ case $cmd in
           serviceStatus="Our internal Service has now been Started"
         ;;
         stop)
+          # To stop the service, first log back into Cloud Foundry, then delete the app by name
           agentSendLogMessage "AUTHENICATING - into Cloud Foundry using the following ...."
           agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE   
