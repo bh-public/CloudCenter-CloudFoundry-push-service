@@ -102,8 +102,9 @@ case $cmd in
           cd $APP_DIR
           # Choose Application environment or build type
           case $APP_BUILD_TYPE in
-          		Gradle)
-          		agentSendLogMessage "INSTALL - Installing Java8 for gradle JAVA compiles"
+          	Gradle)
+          		agentSendLogMessage "GRADLE APPLICATION - Need to install JAVA compiler first"
+          		agentSendLogMessage "INSTALLING - Java8 for gradle JAVA compiles"
 				sudo yum install -y java-1.8.0-openjdk-headless
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
@@ -111,17 +112,23 @@ case $cmd in
                 ./gradlew clean assemble > compile.log
                 COMPILE_LOG=$(cat compile.log)
                 appSendLogMessage "$COMPILE_LOG"
-           	    ;;
-           	   Python)
+           	 ;;
+           	 Python)
+           	 agentSendLogMessage "PYTHON APPLICATION - Processing Application in Cloud Foundry"
            	   # No compile necessary
-           	   ;;
-           	   Web)
+           	 ;;
+           	 Web)
+           		agentSendLogMessage "WEBSITE APPLICATION - Processing Application in Cloud Foundry"
            	   # check for static file, for php and static web apps
-           	   PHP)
+           	 ;;
+           	 PHP)
+           	 	agentSendLogMessage "PHP APPLICATION - Processing Application in Cloud Foundry"
            	   # Nothing to do
-           	   ;;          	   
+           	 ;;          	   
           esac
           # This is the Meat of the service, call cf cli and cf push the application to CF
+          agentSendLogMessage "Logging into Cloud Foundry using the following ...."
+          agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
           cf push $CF_APP_NAME > cfrun.log
           CF_LOG=$(cat cfrun.log)
