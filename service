@@ -111,7 +111,8 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-headless
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
-                ./gradlew clean assemble > compile.log
+          		chmod +x gradlew 
+                gradlew clean assemble > compile.log
                 COMPILE_LOG=$(cat compile.log)
                 appSendLogMessage "$COMPILE_LOG"
            	 ;;
@@ -125,7 +126,7 @@ case $cmd in
            	 ;;
            	 PHP)
            	 	agentSendLogMessage "PHP APPLICATION - Processing Application in Cloud Foundry"
-           	   # Nothing to do
+           	   # Nothing to do here, either php or html will be seen
            	 ;;          	   
           esac
           # This is the Meat of the service, call cf cli and cf push the application to CF
@@ -135,6 +136,7 @@ case $cmd in
           agentSendLogMessage "DEPLOYING APPLICATION - With cf push $CF_APP_NAME" 
           cf push $CF_APP_NAME > cfrun.log
           CF_LOG=$(cat cfrun.log)
+          agentSendLogMessage "INFORMATIONAL - Lets look at the output from Cloud Foundry after the push" 
           agentSendLogMessage "$CF_LOG"
           agentSendLogMessage "Cloud Foundry Application now deployed"
           serviceStatus="Our internal Service has now been Started"
