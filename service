@@ -99,7 +99,7 @@ case $cmd in
           #cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
           #CF_LOGIN_LOG=$(cat cflogin.log)
           #agentSentLogMessage "$CF_LOGIN_LOG"
-          # trying a new way
+          # trying a new way to authenticate to CF
           # First lets set the API endpoint
           agentSendLogMessage "cf api $CF_API"
           cf api $CF_API
@@ -123,20 +123,23 @@ case $cmd in
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           agentSendLogMessage "changing directory to $APP_DIR"
           cd $APP_DIR
-          agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
-          # Compile Application, in future this should be a switch for mavin, gradle, python ...
+          # Choose Application environment or build type
           case $APP_BUILD_TYPE in
-          		Mavin)
-               ./gradlew clean assemble > compile.log
-               COMPILE_LOG=$(cat compile.log)
-               appSendLogMessage "$COMPILE_LOG"
-           	   ;;
+          		Gradle)
+          		agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
+          	    # Compile Application, in future this should be a switch for mavin, gradle, python ...
+                ./gradlew clean assemble > compile.log
+                COMPILE_LOG=$(cat compile.log)
+                appSendLogMessage "$COMPILE_LOG"
+           	    ;;
            	   Python)
            	   # No compile necessary
            	   ;;
            	   Web)
            	   # check for static file, for php and static web apps
-           	   ;;
+           	   PHP)
+           	   # Nothing to do
+           	   ;;          	   
           esac
           # This is the Meat of the service, call cf cli and cf push the application to CF
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
@@ -147,7 +150,7 @@ case $cmd in
           serviceStatus="Our internal Service has now been Started"
         ;;
         stop)   
-          agentSendLogMessage "REMOVE - delete a stack called $CF_APP_NAME"
+          agentSendLogMessage "REMOVE - delete a application called $CF_APP_NAME"
           cf delete $CF_APP_NAME
           serviceStatus="Stopped"
         ;;
