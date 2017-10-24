@@ -21,7 +21,7 @@
 	*	$CF_APP_URL - URL to HTTP location to grab application
 	*	$CF_APP_NAME - App name in CF that we are creating 
 	*	$APP_DIR - name of the applications directory
-	*   $APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
+	*  	$APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
 
 ### Cloud Foundry Push
 
@@ -29,6 +29,13 @@
 	* git clone $CF_APP_URL
           - APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           - cd $APP_DIR
-          - ./gradlew clean assemble
-          - cf push $CF_APP_NAME
+		- Based on Build type (mavin, gradle, python, PHP, Web or static) we will 
+		CASE
+			-mavin
+			-gradle
+			-pytnon
+			-php
+			-web
+	  - THEN cf push application 
+
 
