@@ -100,6 +100,9 @@ case $cmd in
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           agentSendLogMessage "INFORMATIONAL - Changing directory to $APP_DIR where the application is stored"
           cd $APP_DIR
+          pwd > wd.log
+          WD_LOG=$(cat wd.log)
+          agentSendLogMessage "INFORMATIONAL - Working directory for App is $WD_LOG"
           # Choose Application environment or build type
           case $APP_BUILD_TYPE in
           	Gradle)
@@ -108,7 +111,6 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-headless
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
-          	    # Compile Application, in future this should be a switch for mavin, gradle, python ...
                 ./gradlew clean assemble > compile.log
                 COMPILE_LOG=$(cat compile.log)
                 appSendLogMessage "$COMPILE_LOG"
@@ -127,9 +129,10 @@ case $cmd in
            	 ;;          	   
           esac
           # This is the Meat of the service, call cf cli and cf push the application to CF
-          agentSendLogMessage "Logging into Cloud Foundry using the following ...."
+          agentSendLogMessage "AUTHENICATING - into Cloud Foundry using the following ...."
           agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
           cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
+          agentSendLogMessage "DEPLOYING APPLICATION - With cf push $CF_APP_NAME" 
           cf push $CF_APP_NAME > cfrun.log
           CF_LOG=$(cat cfrun.log)
           agentSendLogMessage "$CF_LOG"
