@@ -43,8 +43,8 @@ cd ~
 sudo mv /etc/yum.repos.d/cliqr.repo ~
 
 agentSendLogMessage "EXTERNAL SERVICE - Cloud Foundry Service to push an application has started"
-agentSendLogMessage "We need to update the OS and add some packages to run the service"
-agentSendLogMessage "Executing a YUM UPDATE and installing epl-release" 
+agentSendLogMessage "We need to update the OS and add some packages to run the service first"
+agentSendLogMessage "Executing a YUM UPDATE on BASE OS to insure its clean" 
 
 sudo yum update -y
 
@@ -55,10 +55,9 @@ sudo yum update -y
 
 env
 
-print_log "$(env)"
-
 agentSendLogMessage $(env)
 
+# cmd is our case variable for START and STOP of this Cloud Foundry service
 cmd=$1
 serviceStatus=""
 
@@ -71,62 +70,43 @@ fi
 
 
 
-
+# Install wget to use as a vehicle to move bits around
 agentSendLogMessage "INSTALL - Installing wget for application bits download"
 sudo yum install -y wget
-
-agentSendLogMessage "INSTALL - Installing Java8 for gradle compiles"
-sudo yum install -y java-1.8.0-openjdk-headless
-sudo yum install -y java-1.8.0-openjdk-devel
 
 # Fetch the bits for the CLI using WGET
 agentSendLogMessage "Downloading the CLI tools needed for cloud foundry"
 sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
 
+# Install Cloud Foundry CLI called CF
 agentSendLogMessage "INSTALL - Installing Cloud Foundry CLI client ..."
 sudo yum install -y cf-cli
 
-agentSendLogMessage "Install git" 
+# Install GIT to fetch applications bits with
+agentSendLogMessage "INSTALL - git to use to get applications bits into this service to deploy" 
 sudo yum install -y git
+
 agentSendLogMessage "All done with needed packages for the service, now to login, compile and push app"
+
 # Run the Cloud Foundry Push Service
 case $cmd in
         start)
     	  agentSendLogMessage "Executing START in the Script to login, GIT, Compile and CF Push App" 
-          #agentSendLogMessage "cf login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]" 
-          agentSendLogMessage "Logging into Cloud Foundry using the following ...."
-          #agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
-          #cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE
-          #CF_LOGIN_LOG=$(cat cflogin.log)
-          #agentSentLogMessage "$CF_LOGIN_LOG"
-          # trying a new way to authenticate to CF
-          # First lets set the API endpoint
-          agentSendLogMessage "cf api $CF_API"
-          cf api $CF_API
-          cf api > cf-api.log
-          CF_API_LOG=$(cat cf-api.log)
-          agentSendLogMessage "API endpoint set to $CF_API_LOG"
-          # Next lets login with username and passwd
-          agentSendLogMessage "cf auth $CF_USER $CF_PASS"
-          cf auth $CF_USER $CF_PASS > cf-login.log
-          CF_LOGIN_LOG=$(cat cf-login.log) 
-          agentSendLogMessage "$CF_LOGIN_LOG"
-          # Next lets set the target organization and space for our application
-          agentSendLogMessage "cf target -o $CF_ORG -s $CF_SPACE"
-          cf target -o $CF_ORG -s $CF_SPACE > cf-target.log
-          CF_TARGET_LOG=$(cat cf-target.log)
-          agentSendLogMessage "$CF_TARGET_LOG"
+      	  # Here is our Name of the App in CF   
           agentSendLogMessage "Cloud Foundry Application name to deploy is  $CF_APP_NAME"
           # Next clone the app package from github     
-          agentSendLogMessage "START - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
+          agentSendLogMessage "DOWNLOADING - GIT CLONE downloading ... the Application from $CF_APP_URL and saving locally"
           git clone $CF_APP_URL
           APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
-          agentSendLogMessage "changing directory to $APP_DIR"
+          agentSendLogMessage "INFORMATIONAL - Changing directory to $APP_DIR where the application is stored"
           cd $APP_DIR
           # Choose Application environment or build type
           case $APP_BUILD_TYPE in
           		Gradle)
-          		agentSendLogMessage "Compiling the application with gradle, this could take a long time ...."
+          		agentSendLogMessage "INSTALL - Installing Java8 for gradle JAVA compiles"
+				sudo yum install -y java-1.8.0-openjdk-headless
+				sudo yum install -y java-1.8.0-openjdk-devel
+          		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
           	    # Compile Application, in future this should be a switch for mavin, gradle, python ...
                 ./gradlew clean assemble > compile.log
                 COMPILE_LOG=$(cat compile.log)
