@@ -112,7 +112,7 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
           		chmod +x gradlew 
-                gradlew clean assemble > compile.log
+                source gradlew clean assemble > compile.log
                 COMPILE_LOG=$(cat compile.log)
                 appSendLogMessage "$COMPILE_LOG"
            	 ;;
@@ -141,7 +141,10 @@ case $cmd in
           agentSendLogMessage "Cloud Foundry Application now deployed"
           serviceStatus="Our internal Service has now been Started"
         ;;
-        stop)   
+        stop)
+          agentSendLogMessage "AUTHENICATING - into Cloud Foundry using the following ...."
+          agentSendLogMessage "cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE"
+          cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE   
           agentSendLogMessage "REMOVE - delete a application called $CF_APP_NAME"
           cf delete $CF_APP_NAME
           serviceStatus="Stopped"
