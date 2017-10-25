@@ -112,9 +112,9 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
           		# chmod +x gradlew 
-                /root/$APP_DIR/gradlew clean assemble
-                # COMPILE_LOG=$(cat compile.log)
-                # appSendLogMessage "$COMPILE_LOG"
+                /root/$APP_DIR/gradlew clean assemble > compile.log
+                COMPILE_LOG=$(tail compile.log)
+                appSendLogMessage "$COMPILE_LOG"
            	 ;;
            	 Python)
            	 agentSendLogMessage "PYTHON APPLICATION - Processing Application in Cloud Foundry"
