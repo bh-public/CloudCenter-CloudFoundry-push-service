@@ -1,4 +1,4 @@
- # cf-push
+# cf-push
 
  * This is a Cisco Cloud Center external service example to deploy an Cloud Foundry Application
  * Cloud Foundry is a PaaS system, so what we are doing is front ending the Login and Push
@@ -9,9 +9,9 @@
    for login, password, Organization, Space, API endpoint.  I have defined them below. 
    
    Lastly this service ONLY pulls from GIT today, that was the easiest way to get it working and
-   should be where all code is stored anyhow.  And it FREE
+   should be where all code is stored anyhow.  And it's FREE
 
- ### Cloud Foundry env vars to be used or mapped into Cloud Center
+ ### Cloud Foundry env vars to be used or mapped from Cloud Center to the service script
 
 	*	$CF_API - API endpoint of cloud foundry instance  
 	*	$CF_USER - User name in cloud foundry
@@ -21,15 +21,15 @@
 	*	$CF_APP_URL - URL to HTTP location to grab application
 	*	$CF_APP_NAME - App name in CF that we are creating 
 	*	$APP_DIR - name of the applications directory
-	*  	$APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, static
+	*  	$APP_BUILD_TYPE - type of application to compile, mavin, gradle, python, php, and web
 
-### Cloud Foundry Push
+### Cloud Foundry Push logic, note we can run a few different application types
 
 	* cf login -a $CF_API -u $CF_USER -p $CF_PASS -o $CF_ORG -s $CF_SPACE > cflogin.log
 	* git clone $CF_APP_URL
           - APP_DIR=$(echo $CF_APP_URL | sed 's/.*\///')
           - cd $APP_DIR
-		- Based on Build type (mavin, gradle, python, PHP, Web or static) we will 
+		- Based on Build type (mavin, gradle, python, PHP, and Web) we will 
 		CASE
 			-mavin
 			-gradle
@@ -38,4 +38,4 @@
 			-web
 	  - THEN cf push application 
 
-
+### First Release 

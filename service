@@ -111,8 +111,8 @@ case $cmd in
 				sudo yum install -y java-1.8.0-openjdk-headless
 				sudo yum install -y java-1.8.0-openjdk-devel
           		agentSendLogMessage "COMPILING - The application with gradle, this could take a long time ...."
-          		chmod +x gradlew 
-                source gradlew clean assemble
+          		# chmod +x gradlew 
+                source /root/$APP_DIR/gradlew clean assemble
                 # COMPILE_LOG=$(cat compile.log)
                 # appSendLogMessage "$COMPILE_LOG"
            	 ;;
