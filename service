@@ -50,7 +50,7 @@ sudo yum update -y
 
 # sudo yum install -y epel-release
 
-. /utils.sh
+#. /utils.sh
 
 
 env
